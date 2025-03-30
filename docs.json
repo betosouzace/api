@@ -2,20 +2,28 @@
     "openapi": "3.0.0",
     "info": {
         "title": "API de Finanças Pessoais",
-        "description": "API para gerenciamento de finanças pessoais",
+        "description": "API para gerenciamento de finanças pessoais, incluindo transações, contas, categorias e configurações",
+        "contact": {
+            "name": "Suporte Técnico",
+            "email": "contato@financaspessoais.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
         "version": "1.0.0"
     },
     "servers": [
         {
-            "url": "/",
-            "description": "Servidor Local"
+            "url": "http://my-default-host.com",
+            "description": "API Server"
         }
     ],
     "paths": {
         "/api/transactions": {
             "get": {
                 "tags": [
-                    "Transactions"
+                    "Transações"
                 ],
                 "summary": "List user transactions",
                 "operationId": "listTransactions",
@@ -57,7 +65,7 @@
             },
             "post": {
                 "tags": [
-                    "Transactions"
+                    "Transações"
                 ],
                 "summary": "Create a new transaction",
                 "operationId": "createTransaction",
@@ -170,7 +178,7 @@
         "/api/transactions/{id}": {
             "get": {
                 "tags": [
-                    "Transactions"
+                    "Transações"
                 ],
                 "summary": "Get transaction details",
                 "operationId": "getTransaction",
@@ -220,7 +228,7 @@
             },
             "put": {
                 "tags": [
-                    "Transactions"
+                    "Transações"
                 ],
                 "summary": "Update transaction",
                 "operationId": "updateTransaction",
@@ -320,7 +328,7 @@
             },
             "delete": {
                 "tags": [
-                    "Transactions"
+                    "Transações"
                 ],
                 "summary": "Delete transaction",
                 "operationId": "deleteTransaction",
@@ -1945,6 +1953,99 @@
                     }
                 }
             }
+        },
+        "/api/settings": {
+            "get": {
+                "tags": [
+                    "Configurações"
+                ],
+                "summary": "Obter configurações do usuário",
+                "description": "Retorna as configurações atuais do usuário autenticado",
+                "operationId": "getUserSettings",
+                "responses": {
+                    "200": {
+                        "description": "Configurações do usuário",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSettings"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Configurações"
+                ],
+                "summary": "Atualizar configurações do usuário",
+                "description": "Atualiza as configurações do usuário autenticado",
+                "operationId": "updateUserSettings",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateUserSettingsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Configurações atualizadas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UserSettings"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erro de validação",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Os dados informados são inválidos."
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Não autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -2127,6 +2228,100 @@
                     },
                     "decimal_places": {
                         "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "UserSettings": {
+                "title": "User Settings",
+                "description": "Configurações do usuário",
+                "properties": {
+                    "language": {
+                        "description": "Código do idioma",
+                        "type": "string",
+                        "enum": [
+                            "pt-br",
+                            "en",
+                            "es"
+                        ],
+                        "example": "pt-br"
+                    },
+                    "language_name": {
+                        "description": "Nome do idioma",
+                        "type": "string",
+                        "example": "Português Brasileiro"
+                    },
+                    "color_scheme": {
+                        "description": "Esquema de cores",
+                        "type": "string",
+                        "enum": [
+                            "light",
+                            "dark",
+                            "semi-dark"
+                        ],
+                        "example": "light"
+                    },
+                    "color_scheme_name": {
+                        "description": "Nome do esquema de cores",
+                        "type": "string",
+                        "example": "Claro"
+                    },
+                    "primary_color": {
+                        "description": "Cor primária em formato hexadecimal",
+                        "type": "string",
+                        "example": "#4F46E5"
+                    },
+                    "secondary_color": {
+                        "description": "Cor secundária em formato hexadecimal",
+                        "type": "string",
+                        "example": "#10B981"
+                    },
+                    "main_currency": {
+                        "description": "Moeda fiduciária principal",
+                        "type": "string",
+                        "example": "BRL"
+                    }
+                },
+                "type": "object"
+            },
+            "UpdateUserSettingsRequest": {
+                "title": "Update User Settings Request",
+                "description": "Dados para atualização das configurações do usuário",
+                "properties": {
+                    "language": {
+                        "description": "Código do idioma",
+                        "type": "string",
+                        "enum": [
+                            "pt-br",
+                            "en",
+                            "es"
+                        ],
+                        "example": "pt-br"
+                    },
+                    "color_scheme": {
+                        "description": "Esquema de cores",
+                        "type": "string",
+                        "enum": [
+                            "light",
+                            "dark",
+                            "semi-dark"
+                        ],
+                        "example": "dark"
+                    },
+                    "primary_color": {
+                        "description": "Cor primária em formato hexadecimal",
+                        "type": "string",
+                        "example": "#4F46E5"
+                    },
+                    "secondary_color": {
+                        "description": "Cor secundária em formato hexadecimal",
+                        "type": "string",
+                        "example": "#10B981"
+                    },
+                    "main_currency": {
+                        "description": "Moeda fiduciária principal",
+                        "type": "string",
+                        "example": "USD"
                     }
                 },
                 "type": "object"
@@ -2356,12 +2551,16 @@
             "description": "Endpoints para autenticação social"
         },
         {
-            "name": "Two Factor Authentication",
-            "description": "Endpoints para autenticação em duas etapas"
+            "name": "Transações",
+            "description": "Operações relacionadas a transações financeiras"
         },
         {
-            "name": "Transactions",
-            "description": "Transactions"
+            "name": "Configurações",
+            "description": "Operações relacionadas a configurações do usuário"
+        },
+        {
+            "name": "Two Factor Authentication",
+            "description": "Endpoints para autenticação em duas etapas"
         }
     ]
 }
